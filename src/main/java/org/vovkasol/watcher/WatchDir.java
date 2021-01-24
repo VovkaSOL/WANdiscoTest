@@ -34,16 +34,6 @@ public class WatchDir {
      */
     private void register(Path dir) throws IOException {
         WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        if (trace) {
-            Path prev = keys.get(key);
-            if (prev == null) {
-                System.out.format("register: %s\n", dir);
-            } else {
-                if (!dir.equals(prev)) {
-                    System.out.format("update: %s -> %s\n", prev, dir);
-                }
-            }
-        }
         keys.put(key, dir);
     }
 
@@ -119,8 +109,16 @@ public class WatchDir {
 
                 // print out event
                 System.out.format("%s: %s\n", event.kind().name(), child);
-                //TODO make multithreading work
-                listener.event(child.toString(), FileEvents.FILE_CREATED);
+                //TODO make multithreading
+                if ("ENTRY_CREATE".equals(event.kind().name())) {
+                    listener.event(child.toString(), FileEvents.FILE_CREATED);
+                }
+                if ("ENTRY_DELETE".equals(event.kind().name())) {
+                    listener.event(child.toString(), FileEvents.FILE_DELETED);
+                }
+                if ("ENTRY_MODIFY".equals(event.kind().name())) {
+                    listener.event(child.toString(), FileEvents.FILE_MODIFIED);
+                }
                 // if directory is created, and watching recursively, then
                 // register it and its sub-directories
                 if (recursive && (kind == ENTRY_CREATE)) {

@@ -9,10 +9,12 @@ import java.nio.file.Paths;
  * WANdisco test
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         //TODO validate input
         //TODO test Watcher with symlink (maybe problem)
-        //sFileUtils.copyFileToDirectory(new File("C://1//dfd.txt"),new File("C://2//"));
+        //TODO very stupid start sync
+        new StartUpDirSynchronizer(args[0], args[1]).sync();
+        new StartUpDirSynchronizer(args[1], args[0]).sync();
         new WatchDir(Paths.get(args[0]), true, new StupidDirectoryDuplicator(args[0], args[1])).processEvents();
     }
 }
